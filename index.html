@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Github Clone</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand">Github Clone</a>
+      <div class="form-inline">
+        <input
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Search Users"
+          aria-label="Search"
+          id="keyword"
+        />
+        <button
+          class="btn btn-outline-dark my-2 my-sm-0"
+          type="search"
+          onclick="search(document.getElementById('keyword').value)"
+        >
+          Search
+        </button>
+      </div>
+    </nav>
+    <div class="text-center">
+      <h4>Welcome to Github Clone</h4>
+    </div>
+
+    <div class="container-fluid" id="container">
+      <div class="row justify-content-center" id="welcome"></div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
