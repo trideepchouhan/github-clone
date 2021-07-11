@@ -1,36 +1,22 @@
 async function search(key) {
   clearTable();
-  console.log("Fetching Users");
   let allUsers = await fetch("https://api.github.com/users", {
     headers: {
       Accept: "application / vnd.github.v3 + json",
     },
   }).then((response) => response.json());
-  //allUsers - Array of user objects
-  console.log(allUsers);
-  console.log("all Users Fetched");
+
   let filteredUsers = allUsers.filter((user) => user.login.includes(key));
   displayUsers(filteredUsers);
-  //   let repoUrls = users.map((user) => user.repos_url);
-  //   console.log(repoUrls);
-  //   repoUrls.forEach((element) => findRepos(element).then((e) => console.log(e)));
-
-  //   var element = document.createElement("div");
-  //   element.innerHTML = "Repositories";
-  //   document.body.appendChild(element);
 }
 
 function displayUsers(users) {
-  console.log("Inside Display users");
   let table = document.getElementById("welcome");
-  console.log("First Set", table);
-  if (table === null) {
-    table = document.createElement("div");
-    table.classList = "row justify-content-center";
-    table.setAttribute("id", "welcome");
-    document.getElementById("container").appendChild(table);
-  }
-  console.log("Second Set", table);
+  let userHeading = document.createElement("h3");
+  userHeading.classList = "col-12 text-center";
+  userHeading.innerHTML = `${users.length} Users found`;
+  table.appendChild(userHeading);
+
   for (const user of users) {
     table.appendChild(createUserRow(user));
     console.log(user);
@@ -39,34 +25,138 @@ function displayUsers(users) {
 
 function createUserRow(user) {
   let userRow = document.createElement("div");
-  userRow.classList =
-    "col-4 border border-left-0 border-right-0 border-secondary";
+  userRow.classList = "col-4 card border border-secondary";
 
   let userRowBody = document.createElement("div");
-  userRowBody.classList = "text-center";
+  userRowBody.classList = "card-body";
 
   let heading = document.createElement("p");
-  heading.innerHTML = `user: ${user.login}`;
+  heading.classList = "lead";
+  heading.innerHTML = `User: ${user.login}`;
 
-  userRowBody.append(heading);
+  let repositoryLink = document.createElement("button");
+  repositoryLink.addEventListener(
+    "click",
+    function () {
+      findRepos(user);
+    },
+    false
+  );
+  repositoryLink.classList = "btn btn-secondary";
+  repositoryLink.innerHTML = "Go to Repositories";
+
+  userRowBody.append(heading, repositoryLink);
   userRow.append(userRowBody);
   return userRow;
 }
 
 function clearTable() {
   let table = document.getElementById("welcome");
-  console.log("inside Clear");
   table.remove();
-  console.log("after table remove");
+
+  table = document.createElement("div");
+  table.classList = "row justify-content-center";
+  table.setAttribute("id", "welcome");
+  document.getElementById("container").appendChild(table);
 }
 
-async function findRepos(repoUrl) {
-  let repo = await fetch(repoUrl, {
+async function findRepos(user) {
+  let repo = await fetch(user.repos_url, {
     headers: {
       Accept: "application / vnd.github.v3 + json",
     },
   }).then((response) => response.json());
-  return repo;
+
+  clearTable();
+  console.log(repo);
+  displayUserRepos(user.login, repo);
+}
+
+function displayUserRepos(username, repos) {
+  let table = document.getElementById("welcome");
+  let userHeading = document.createElement("h3");
+  userHeading.classList = "col-12 text-center";
+  userHeading.innerHTML = `${username} : ${repos.length} repos found`;
+  table.appendChild(userHeading);
+
+  for (const repo of repos) {
+    table.appendChild(createRepoRow(repo));
+    console.log(repo);
+  }
+}
+
+function createRepoRow(repo) {
+  let userRow = document.createElement("div");
+  userRow.classList = "col-4 card border border-secondary";
+
+  let userRowBody = document.createElement("div");
+  userRowBody.classList = "card-body";
+
+  let heading = document.createElement("p");
+  heading.classList = "lead";
+  heading.innerHTML = `Repository name: ${repo.full_name}`;
+
+  let repositoryLink = document.createElement("button");
+  repositoryLink.addEventListener(
+    "click",
+    function () {
+      findFiles(repo);
+    },
+    false
+  );
+  repositoryLink.classList = "btn btn-secondary";
+  repositoryLink.innerHTML = "Go to Files";
+
+  userRowBody.append(heading, repositoryLink);
+  userRow.append(userRowBody);
+  return userRow;
+}
+
+async function findFiles(repo) {
+  let url = `${repo.url}/contents`;
+  let files = await fetch(url, {
+    headers: {
+      Accept: "application / vnd.github.v3 + json",
+    },
+  }).then((response) => response.json());
+
+  clearTable();
+  console.log(files);
+  displayUserRepoFiles(repo.full_name, files);
+}
+
+function displayUserRepoFiles(reponame, files) {
+  let table = document.getElementById("welcome");
+  console.log("Second Set", table);
+  let userHeading = document.createElement("h3");
+  userHeading.classList = "col-12 text-center";
+  userHeading.innerHTML = `${reponame} : ${files.length} files found`;
+  table.appendChild(userHeading);
+
+  for (const file of files) {
+    table.appendChild(createRepoFileRow(file));
+    console.log(file);
+  }
+}
+
+function createRepoFileRow(file) {
+  let userRow = document.createElement("div");
+  userRow.classList = "col-4 card border border-secondary";
+
+  let userRowBody = document.createElement("div");
+  userRowBody.classList = "card-body";
+
+  let heading = document.createElement("p");
+  heading.classList = "font-italic";
+  heading.innerHTML = `File Name: ${file.name}`;
+
+  let headingType = document.createElement("p");
+  headingType.classList = "font-italic";
+  headingType.innerHTML = `File Type: ${file.type}`;
+
+  userRowBody.append(heading, headingType);
+  userRow.append(userRowBody);
+  return userRow;
 }
 
 async function findRepositoriesByUser(user) {
@@ -78,6 +168,6 @@ async function findRepositoriesByUser(user) {
   }).then((response) => response.json());
 }
 
-function findUsersAndRepositories() {}
-
-function listFilesOfRepository() {}
+window.onload = function () {
+  search("");
+};
